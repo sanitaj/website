@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('/img/18.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.wrapper {
+    width: 650px;
+    background: rgba(50, 50, 50, 0.85);
+    border-radius: 20px;
+    padding: 45px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+}
+
+.account-container {
+    text-align: center;
+}
+
+.profile-header {
+    margin-bottom: 15px;
+}
+
+.profile-header img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.profile-header h1 {
+    font-size: 30px;
+    color: #DC7000;
+}
+
+.account-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    border-radius: 14px;
+    transition: 0.3s;
+}
+
+.info-box:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.btn {
+    padding: 12px 22px;
+    background: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.8);
+    transform: scale(1.05);
+}
+
+.logout {
+    background: #DC7000;
+    color: #fff;
+}
+
+.logout:hover {
+    background: #330300;
+}
+
+.register-link {
+    margin-top: 20px;
+}
+
+.register-link p a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.register-link p a:hover {
+    text-decoration: underline;
+}

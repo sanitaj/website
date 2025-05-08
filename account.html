@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Account</title>
+  <link rel="stylesheet" href="/css/account.css" />
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="account-container">
+      <div class="profile-header">
+        <img src="/img/avatar.jpg" alt="User Avatar">
+        <h1>Welcome, <span id="usernameDisplay">User</span>!</h1>
+        <p class="user-role">Premium User</p>
+      </div>
+
+      <div class="account-details">
+        <div class="info-box"><i class='bx bx-envelope'></i><p>Email: <span id="userEmail">user@example.com</span></p></div>
+        <div class="info-box"><i class='bx bx-calendar'></i><p>Member since: <span id="userDate">2025</span></p></div>
+        <div class="info-box"><i class='bx bx-user-check'></i><p>Status: <span id="userStatus">Active</span></p></div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn">Edit Profile</button>
+        <button class="btn">Settings</button>
+        <button id="logoutButton" class="btn logout">Logout</button>
+      </div>
+
+      <div class="register-link">
+        <p><a href="index.html">Return to menu</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/account.js"></script>
+</body>
+</html>

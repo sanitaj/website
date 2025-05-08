@@ -230,25 +230,132 @@ header nav ul li .dropdown li a:hover {
     padding: 50px 0;
 }
 
-.cards .block {
-    flex: 0 1 calc(50% - 15px); 
-    background-color: rgba(255, 255, 255, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* две колонки */
+    gap: 20px; /* расстояние между карточками */
+    justify-items: center; /* выравнивание по центру */
+    margin-top: 40px;
 }
 
-.cards .block h3 {
-    font-size: 50px;
-    font-weight: 700;
-    margin: 15px 0 10px;
+  .cards img {
+    width: 500px;  /* или другой нужный размер */
+    height: auto;
+    opacity: 0;
+    transform: translateX(-100px);
+    transition: all 0.6s ease;
+}
+
+.big-text {
+    padding: 50px 0;
+    font-size: 45px;
+    font-weight: 600;
+    text-align: center;
+    width: 800px;
+}
+
+.floating-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2); /* Полупрозрачный эффект */
+    backdrop-filter: blur(10px);
     color: #fff;
+    font-size: 30px;
     text-align: center;
+    line-height: 60px;
+    border-radius: 50%;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
 }
 
-.cards .block p {
+.floating-button:hover {
+    background: rgba(255, 255, 255, 0.4); /* Чуть светлее при наведении */
+    transform: scale(1.1); /* Увеличение */
+    box-shadow: 0 6px 12px rgba(255, 255, 255, 0.5); /* Эффект свечения */
+}
+
+.footer {
+    background: rgba(51, 3, 0, 1); /* Чистый цвет */
+    padding: 20px;
+    text-align: center;
+
+}
+
+.footer-content p {
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff; /* Чёрный текст */
+}
+
+.footer-links {
     margin-top: 10px;
-    font-size: 22px; 
-    color: #eee;
-    line-height: 1.4;
+}
+
+
+.footer-links a {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    text-decoration: none;
+    transition: 0.3s ease-in-out;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.social-links {
+    margin-top: 15px;
+}
+
+.social-links a {
+    color: #fff;
+    font-size: 22px;
+    margin: 0 10px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    transform: scale(1.2);
+    color: #DC7000;
+}
+
+.footer-content p {
+    font-size: 16px; /* Чуть крупнее, для лучшей читаемости */
+    font-weight: 500; /* Делаем текст чуть выразительнее */
+    letter-spacing: 0.5px; /* Добавляем небольшое расстояние между буквами */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Лёгкий эффект тени */
+}
+
+.footer-links a {
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase; /* Делаем ссылки более заметными */
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.3s ease-in-out;
+}
+
+.footer-links a:hover {
+    color: #000000; /* Акцентный цвет при наведении */
+    text-decoration: underline;
+}
+
+#logoutButton {
+    background: #DC7000;
+    color: #fff;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+
+#logoutButton:hover {
+    background: #330300;
+    transform: scale(1.1);
 }
