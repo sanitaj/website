@@ -213,11 +213,18 @@ header nav ul li.btn a:hover {
     position: sticky;
     top: 10px;
     z-index: 1000;
+    margin-top: 100px;;
 }
 
 .block.sticky + .block {
     margin-top: 120px;
 }
+
+.block.sticky a {
+    height: 120px;
+    display: inline-block;
+}
+
 
 .block.visible {
     opacity: 1;
@@ -240,4 +247,30 @@ header nav ul li.btn a:hover {
     background: rgba(0, 0, 0, 0.4);
     padding: 15px;
     border-radius: 10px;
+}
+
+.circle-back-button {
+    position: fixed;
+    top: 40px; /* Смещаем на 20px вниз */
+    left: 40px; /* Смещаем на 20px вправо */
+    width: 60px; /* Увеличиваем размер в 1.5 раза */
+    height: 60px;
+    background: rgba(200, 200, 200, 0.2);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 30px; /* Увеличиваем размер стрелки */
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease-in-out;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 9999;
+}
+
+.circle-back-button:hover {
+    background: rgba(200, 200, 200, 0.3);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
 }
