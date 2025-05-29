@@ -11,10 +11,6 @@ if (isset($_POST['logout'])) {
     exit();
 }
 
-<<<<<<< HEAD
-// Получаем данные пользователя из БД
-=======
->>>>>>> 745b3a5 (upd)
 $host = "localhost";
 $user = "root";
 $password = "";
@@ -88,17 +84,9 @@ if (!$conn->connect_error) {
         <button type="button" class="btn" onclick="togglePasswordForm()">Change Password</button>
       </div>
     </form>
-<<<<<<< HEAD
-    <!-- Logout вынесен в отдельную форму -->
     <form method="post" style="margin-top:10px;">
       <button type="submit" name="logout" class="btn logout">Logout</button>
     </form>
-    <!-- Форма смены пароля -->
-=======
-    <form method="post" style="margin-top:10px;">
-      <button type="submit" name="logout" class="btn logout">Logout</button>
-    </form>
->>>>>>> 745b3a5 (upd)
     <form class="password-form" id="passwordForm" action="change_password.php" method="post">
       <h3>Change Password</h3>
       <input type="password" name="old_password" placeholder="Current Password" required>
@@ -106,7 +94,7 @@ if (!$conn->connect_error) {
       <button type="submit" class="btn">Update Password</button>
     </form>
     <div class="register-link">
-      <p><a href="index.php">Return to menu</a></p>
+      <p><a href="profile.php">Return</a></p>
     </div>
   </div>
   <script>

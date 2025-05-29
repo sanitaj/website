@@ -1,5 +1,6 @@
 <?php
 session_start();
+var_dump($_SESSION);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,19 +14,9 @@ session_start();
 
 <body>
     <div class="wrapper">
-<<<<<<< HEAD
-        <!-- Кнопка "Вернуться в меню" -->
         <a href="index.php" class="circle-back-button">⟵</a>
-
-
-        <!-- Карточки -->
-=======
-        <a href="index.php" class="circle-back-button">⟵</a>
-
-
->>>>>>> 745b3a5 (upd)
         <div class="cards">
-    <a href="card_regular.php" class="block sticky card-link" style="margin-bottom: 300px;">
+    <a href="#" class="block sticky card-link" data-card="img/11.png" style="margin-bottom: 300px;">
         <img src="img/11.png" alt="">
         <h3>Regular</h3>
         <div class="list">
@@ -34,7 +25,7 @@ session_start();
             <p class="dot-before">Payment by installments" and "Instant installments": buy now - pay later</p>
         </div>
     </a>
-    <a href="card_junior.php" class="block sticky card-link">
+    <a href="#" class="block sticky card-link" data-card="img/12.png">
         <img src="img/12.png" alt="">
         <h3>Junior</h3>
         <div class="list">
@@ -43,7 +34,7 @@ session_start();
             <p class="dot-before">Payment by installments" and "Instant installments": buy now - pay later</p>
         </div>
     </a>
-    <a href="card_silver.php" class="block sticky card-link">
+    <a href="#" class="block sticky card-link" data-card="img/13.png">
         <img src="img/13.png" alt="">
         <h3>Silver</h3>
         <div class="list">
@@ -52,7 +43,7 @@ session_start();
             <p class="dot-before">Payment by installments" and "Instant installments": buy now - pay later</p>
         </div>
     </a>
-    <a href="card_business.php" class="block sticky card-link">
+    <a href="#" class="block sticky card-link" data-card="img/14.png">
         <img src="img/14.png" alt="">
         <h3>Business</h3>
         <div class="list">
@@ -67,6 +58,50 @@ session_start();
     </a>
 </div>
     </div>
-    <script src="js/script.js"></script>
+    <!-- Модальное окно -->
+<div id="cardModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-icon">
+      <i class='bx bx-help-circle'></i>
+    </div>
+    <h2>Подтвердите выбор карты</h2>
+    <p>Вы уверены, что хотите выбрать эту карту?</p>
+    <div class="modal-actions">
+      <button id="confirmCardBtn" class="btn">Да, выбрать</button>
+      <button id="cancelCardBtn" class="btn btn-cancel">Отмена</button>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  let selectedCard = '';
+  document.querySelectorAll('.card-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Только если есть data-card (чтобы не срабатывало на "Learn about us")
+      if (!this.getAttribute('data-card')) return;
+      e.preventDefault();
+      selectedCard = this.getAttribute('data-card');
+      document.getElementById('cardModal').style.display = 'flex';
+    });
+  });
+  document.getElementById('cancelCardBtn').onclick = function() {
+    document.getElementById('cardModal').style.display = 'none';
+  };
+  document.getElementById('confirmCardBtn').onclick = function() {
+    // Отправляем выбранную карту на сервер
+    fetch('save_card.php', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'card_img=' + encodeURIComponent(selectedCard)
+    }).then(res => res.json()).then(data => {
+      if(data.success) {
+        window.location.href = 'profile.php';
+      } else {
+        alert('Ошибка сохранения карты');
+      }
+    });
+  };
+});
+</script>
 </body>
 </html>

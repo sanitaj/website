@@ -1,4 +1,5 @@
 <?php
+session_start();
 require 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -21,7 +22,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     
     if ($stmt->execute()) {
-        echo "Успешная регистрация!";
+        $_SESSION['user_id'] = $conn->insert_id; // сохраняем id нового пользователя
+        header("Location: cards.php");
+        exit();
     } else {
         if ($stmt->errno == 1062) {
             echo "Пользователь с таким username или email уже существует.";

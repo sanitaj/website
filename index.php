@@ -41,7 +41,7 @@ session_start();
                       </li>
                     <li class="btn">
                         <?php if (isset($_SESSION['user_id'])): ?>
-                            <a id="accountButton" href="account.php">Account</a>
+                            <a id="accountButton" href="Profile.php">Account</a>
                         <?php else: ?>
                             <a id="accountButton" href="login.php">Login/Sign up</a>
                         <?php endif; ?>
@@ -64,7 +64,6 @@ session_start();
             <img src="img/picture4.svg" alt="">
         </div>
         <div class="container trending">
-            <a href="cards.php" class="see-all">SEE ALL</a>
             <h3>Check this out</h3>
             
 
