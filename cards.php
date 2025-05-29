@@ -13,11 +13,17 @@ session_start();
 
 <body>
     <div class="wrapper">
+<<<<<<< HEAD
         <!-- Кнопка "Вернуться в меню" -->
         <a href="index.php" class="circle-back-button">⟵</a>
 
 
         <!-- Карточки -->
+=======
+        <a href="index.php" class="circle-back-button">⟵</a>
+
+
+>>>>>>> 745b3a5 (upd)
         <div class="cards">
     <a href="card_regular.php" class="block sticky card-link" style="margin-bottom: 300px;">
         <img src="img/11.png" alt="">
