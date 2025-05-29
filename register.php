@@ -22,11 +22,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $conn->prepare("INSERT INTO users (name, username, phone, email, password) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $name, $username, $phone, $email, $hashed_password);
 
+    
     if ($stmt->execute()) {
         echo "Успешная регистрация!";
     } else {
-        echo "Ошибка: " . $stmt->error;
+        if ($stmt->errno == 1062) {
+            echo "Пользователь с таким username или email уже существует.";
+        } else {
+            echo "Ошибка: " . $stmt->error;
     }
+}
 
     $stmt->close();
     $conn->close();

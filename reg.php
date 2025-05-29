@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,11 +47,11 @@
       <button type="submit" class="btn">Register</button>
 
       <div class="register-link">
-        <p>Already have an account? <a href="login.html">Login</a></p>
+        <p>Already have an account? <a href="login.php">Login</a></p>
       </div>
 
       <div class="register-link">
-        <p><a href="index.html">Return to menu</a></p>
+        <p><a href="index.php">Return to menu</a></p>
       </div>
     </form>
   </div>

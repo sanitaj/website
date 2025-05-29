@@ -1,34 +1,47 @@
 <?php
-$host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "users_db";
-
-$conn = new mysqli($host, $user, $password, $dbname);
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
-}
-
-$username = $_POST['username'];
-$password = $_POST['password'];
-
-$sql = "SELECT * FROM users WHERE username = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($row = $result->fetch_assoc()) {
-    if (password_verify($password, $row['password'])) {
-        echo "Добро пожаловать, " . $row['username'] . "!";
-        // Тут можно сохранить логин в сессии
-    } else {
-        echo "Неверный пароль.";
-    }
-} else {
-    echo "Пользователь не найден.";
-}
-
-$stmt->close();
-$conn->close();
+session_start();
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <link rel="stylesheet" href="css/login_style.css">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="wrapper">
+    <form action="log.php" method="post">
+      <h1>Login</h1>
+
+      <div class="input-box">
+        <input type="text" name="username" placeholder="Username" required />
+        <i class='bx bxs-user'></i>
+      </div>
+
+      <div class="input-box">
+        <input type="password" name="password" id="password" placeholder="Password" required />
+        <i class='bx bxs-lock-alt'></i>
+        <i class='bx bx-show' id="togglePassword"></i>
+      </div>
+
+      <div class="remember-forgot">
+        <label><input type="checkbox" />Remember me</label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn">Login</button>
+
+      <div class="register-link">
+        <p>Don't have an account? <a href="reg.php">Register</a></p>
+      </div>
+
+      <div class="register-link">
+        <p><a href="index.php">Return to menu</a></p>
+      </div>
+    </form>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

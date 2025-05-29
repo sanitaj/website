@@ -274,3 +274,13 @@ header nav ul li.btn a:hover {
     background: rgba(200, 200, 200, 0.3);
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
 }
+
+.card-link {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+.card-link:visited,
+.card-link:active {
+    color: inherit;
+}

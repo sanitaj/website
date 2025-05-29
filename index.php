@@ -1,3 +1,7 @@
+
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,8 +39,13 @@
                           <li><a href="#">Support</a></li>
                         </ul>
                       </li>
-                      
-                    <li class="btn"><a id="accountButton" href="login.html">Login/Sign up</a></li>
+                    <li class="btn">
+                        <?php if (isset($_SESSION['user_id'])): ?>
+                            <a id="accountButton" href="account.php">Account</a>
+                        <?php else: ?>
+                            <a id="accountButton" href="login.php">Login/Sign up</a>
+                        <?php endif; ?>
+                    </li>
                 </ul>
             </nav>
         </header>
@@ -55,7 +64,7 @@
             <img src="img/picture4.svg" alt="">
         </div>
         <div class="container trending">
-            <a href="cards.html" class="see-all">SEE ALL</a>
+            <a href="cards.php" class="see-all">SEE ALL</a>
             <h3>Check this out</h3>
             
 
@@ -75,12 +84,12 @@
       
     </div>
     <script src="js/script.js"></script>
-    <a href="support.html" class="floating-button">💬</a>
+    <a href="support.php" class="floating-button">💬</a>
     <footer class="footer">
       <div class="container">
           <div class="footer-content">
               <p>&copy; 2025 Name of Company. Все права защищены.</p>
-              <p>Лицензия №123456 | <a style="color: white;" href="privacy.html">Политика конфиденциальности</a> | <a style="color: white;" href="terms.html">Условия использования</a></p>
+              <p>Лицензия №123456 | <a style="color: white;" href="privacy.php">Политика конфиденциальности</a> | <a style="color: white;" href="terms.php">Условия использования</a></p>
           </div>
           <div class="footer-links">
               <a href="#">О нас</a>
