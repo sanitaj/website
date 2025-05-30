@@ -23,8 +23,8 @@ $result = $stmt->get_result();
 
 if ($row = $result->fetch_assoc()) {
     if (password_verify($password, $row['password'])) {
-        $_SESSION['user_id'] = $row['id']; // Сохраняем id пользователя в сессию
-        header("Location: account.php"); // Перенаправление на страницу аккаунта
+        $_SESSION['user_id'] = $row['id']; 
+        header("Location: profile.php");
         exit();
     } else {
         echo "Неверный пароль.";

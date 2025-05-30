@@ -15,14 +15,14 @@ $user = [
     'username' => $username,
     'email' => $email,
     'phone' => $phone,
-    'balance' => $balance ?? '0 ₽',
+    'balance' => $balance,
     'card_img' => $card_img ?: 'img/11.png'
 ];
 $transactions = [
-    ['date' => '2024-05-28', 'desc' => 'Перевод на карту', 'sum' => '-1 000 ₽'],
-    ['date' => '2024-05-27', 'desc' => 'Пополнение', 'sum' => '+5 000 ₽'],
-    ['date' => '2024-05-25', 'desc' => 'Оплата услуг', 'sum' => '-2 300 ₽'],
-    ['date' => '2024-05-20', 'desc' => 'Зачисление зарплаты', 'sum' => '+50 000 ₽'],
+    ['date' => '2024-05-28', 'desc' => 'Перевод на карту', 'sum' => '-1 000 zl'],
+    ['date' => '2024-05-27', 'desc' => 'Пополнение', 'sum' => '+5 000 zl'],
+    ['date' => '2024-05-25', 'desc' => 'Оплата услуг', 'sum' => '-2 300 zl'],
+    ['date' => '2024-05-20', 'desc' => 'Зачисление зарплаты', 'sum' => '+50 000 zl'],
 ];
 ?>
 <!DOCTYPE html>
@@ -44,12 +44,12 @@ $transactions = [
             <div class="info-row"><i class='bx bxs-user'></i> <span><?php echo $user['username']; ?></span></div>
             <div class="info-row"><i class='bx bxs-envelope'></i> <span><?php echo $user['email']; ?></span></div>
             <div class="info-row"><i class='bx bxs-phone'></i> <span><?php echo $user['phone']; ?></span></div>
-            <a href="account.php" class="btn">Изменить данные</a>
+            <a href="account.php" class="btn">Настройки профиля</a>
         </div>
         <!-- Окно 2: Состояние счета -->
         <div class="profile-box balance-info">
             <h2>Счет</h2>
-            <div class="balance"><?php echo $user['balance']; ?></div>
+            <div class="balance"><?php echo number_format($user['balance'], 2, '.', ' ') . ' zł'; ?></div>
             <a href="transaction.php" class="btn">Отправить деньги</a>
         </div>
         <!-- Окно 3: Банковская карта -->
