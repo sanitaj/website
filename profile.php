@@ -2,6 +2,18 @@
 session_start();
 require 'db.php';
 
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
+    $token = $_COOKIE['rememberme'];
+    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt->bindParam(':token', $token);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+    }
+}
+
 $user_id = $_SESSION['user_id'] ?? 0;
 
 $user = [

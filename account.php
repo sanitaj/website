@@ -1,18 +1,37 @@
 <?php
 session_start();
+require 'db.php';
+
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
+    $token = $_COOKIE['rememberme'];
+    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt->bindParam(':token', $token);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+    }
+}
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
 if (isset($_POST['logout'])) {
+    if (isset($_SESSION['user_id'])) {
+        $stmt = $conn->prepare("UPDATE users SET remember_token = NULL WHERE id = :id");
+        $stmt->bindParam(':id', $_SESSION['user_id']);
+        $stmt->execute();
+    }
+    setcookie('rememberme', '', time() - 3600, "/");
     session_unset();
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-require 'db.php'; // Подключение к базе данных через PDO
 require_once __DIR__ . '/vendor/autoload.php';
 use RobThree\Auth\TwoFactorAuth;
 
@@ -56,7 +75,7 @@ if (!empty($userData['ga_secret'])) {
     $qrCodeHtml = '
     <form method="post" style="text-align:center; margin-top:20px;">
       <button name="enable_2fa" class="btn btn-2fa">
-        <i class="bx bxs-shield"></i> Включить двухфакторную аутентификацию
+        <i class="bx bxs-shield"></i> Connect 2FA
       </button>
     </form>';
 }
