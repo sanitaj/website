@@ -26,6 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if ($stmt->execute()) {
             $_SESSION['user_id'] = $conn->lastInsertId(); // сохраняем id нового пользователя
+            $_SESSION['username'] = $username; // сохраняем username нового пользователя
             header("Location: cards.php");
             exit();
         }

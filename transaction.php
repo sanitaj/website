@@ -2,6 +2,18 @@
 session_start();
 require 'db.php';
 
+if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
+    $token = $_COOKIE['rememberme'];
+    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt->bindParam(':token', $token);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($user) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+    }
+}
+
 // Получаем текущий баланс пользователя
 $user_id = $_SESSION['user_id'] ?? 0;
 $balance = 0.0;
@@ -19,52 +31,63 @@ try {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = floatval($_POST['amount'] ?? 0);
-    $phone = $_POST['phone'] ?? '';
+    $username = trim($_POST['username'] ?? '');
+
     if ($amount <= 0) {
         $message = "Введите корректную сумму.";
     } else {
-        if (isset($_POST['request'])) {
-            // Запросить деньги (прибавить)
-            $balance += $amount;
-            try {
-                $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
-                $stmt->bindParam(':balance', $balance);
-                $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
-                $stmt->execute();
+        // Проверяем, существует ли получатель
+        $stmt = $conn->prepare("SELECT id, balance FROM users WHERE username = :username");
+        $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $recipient = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                // Добавляем транзакцию (пополнение)
-                $desc = "Пополнение через запрос";
-                $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
-                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-                $stmt->bindParam(':description', $desc, PDO::PARAM_STR);
-                $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
-                $stmt->execute();
-
-                $message = "Сумма успешно зачислена!";
-            } catch (PDOException $e) {
-                $message = "Ошибка: " . $e->getMessage();
-            }
+        if (!$recipient) {
+            $message = "Пользователь с таким именем не найден.";
+        } elseif ($recipient['id'] == $user_id) {
+            $message = "Нельзя отправить деньги самому себе.";
         } elseif (isset($_POST['send'])) {
-            // Отправить деньги (вычесть)
+            // Отправить деньги
             if ($balance >= $amount) {
-                $balance -= $amount;
                 try {
+                    $conn->beginTransaction();
+
+                    // Списываем у отправителя
+                    $newSenderBalance = $balance - $amount;
                     $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
-                    $stmt->bindParam(':balance', $balance);
+                    $stmt->bindParam(':balance', $newSenderBalance);
                     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
                     $stmt->execute();
 
-                    // Добавляем транзакцию (расход)
-                    $desc = "Перевод пользователю " . htmlspecialchars($phone);
-                    $negAmount = -$amount;
+                    // Зачисляем получателю
+                    $newRecipientBalance = floatval($recipient['balance']) + $amount;
+                    $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
+                    $stmt->bindParam(':balance', $newRecipientBalance);
+                    $stmt->bindParam(':id', $recipient['id'], PDO::PARAM_INT);
+                    $stmt->execute();
+
+                    // Транзакция для отправителя (расход)
+                    $descSender = "Перевод пользователю " . htmlspecialchars($username);
                     $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
                     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-                    $stmt->bindParam(':description', $desc, PDO::PARAM_STR);
+                    $stmt->bindParam(':description', $descSender, PDO::PARAM_STR);
+                    $negAmount = -$amount;
                     $stmt->bindParam(':amount', $negAmount, PDO::PARAM_STR);
                     $stmt->execute();
 
+                    // Транзакция для получателя (пополнение)
+                    $descRecipient = "Получено от пользователя " . htmlspecialchars($_SESSION['username'] ?? $user_id);
+                    $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
+                    $stmt->bindParam(':user_id', $recipient['id'], PDO::PARAM_INT);
+                    $stmt->bindParam(':description', $descRecipient, PDO::PARAM_STR);
+                    $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
+                    $stmt->execute();
+
+                    $conn->commit();
+                    $balance = $newSenderBalance;
                     $message = "Сумма успешно отправлена!";
                 } catch (PDOException $e) {
+                    $conn->rollBack();
                     $message = "Ошибка: " . $e->getMessage();
                 }
             } else {
@@ -91,15 +114,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="message"><?php echo $message; ?></div>
       <?php endif; ?>
       <div class="input-box">
-        <input type="text" name="phone" placeholder="Номер телефона" required />
-        <i class='bx bxs-phone'></i>
+        <input type="text" name="username" placeholder="Имя пользователя получателя" required />
+        <i class='bx bxs-user'></i>
       </div>
       <div class="input-box">
         <input type="number" name="amount" placeholder="Сумма" min="1" step="0.01" required />
         <i class='bx bx-money'></i>
       </div>
       <div class="button-row">
-        <button type="submit" name="request" class="btn request">Запросить</button>
         <button type="submit" name="send" class="btn">Отправить</button>
       </div>
       <div class="register-link">
