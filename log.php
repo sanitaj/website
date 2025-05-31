@@ -1,35 +1,29 @@
 <?php
 session_start();
-
-$host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "users_db";
-
-try {
-    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Ошибка подключения: " . $e->getMessage());
-}
+require 'db.php';
+require_once __DIR__ . '/vendor/autoload.php';
+use RobThree\Auth\TwoFactorAuth;
 
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$sql = "SELECT * FROM users WHERE username = :username";
-$stmt = $conn->prepare($sql);
-$stmt->bindParam(':username', $username, PDO::PARAM_STR);
+$stmt = $conn->prepare("SELECT id, password, ga_secret FROM users WHERE username = :username");
+$stmt->bindParam(':username', $username);
 $stmt->execute();
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    if (password_verify($password, $row['password'])) {
-        $_SESSION['user_id'] = $row['id']; 
-        header("Location: profile.php");
-        exit();
+if ($user && password_verify($password, $user['password'])) {
+    if (!empty($user['ga_secret'])) {
+        $_SESSION['tmp_user_id'] = $user['id'];
+        header('Location: 2fa.php');
+        exit;
     } else {
-        echo "Неверный пароль.";
+        $_SESSION['user_id'] = $user['id'];
+        header('Location: profile.php');
+        exit;
     }
 } else {
-    echo "Пользователь не найден.";
+    header('Location: login.php?error=1');
+    exit;
 }
 ?>

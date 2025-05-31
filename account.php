@@ -13,6 +13,8 @@ if (isset($_POST['logout'])) {
 }
 
 require 'db.php'; // Подключение к базе данных через PDO
+require_once __DIR__ . '/vendor/autoload.php';
+use RobThree\Auth\TwoFactorAuth;
 
 $userData = [
     'name' => 'User',
@@ -24,12 +26,39 @@ $userData = [
 
 try {
     // Подготовка запроса для получения данных пользователя
-    $stmt = $conn->prepare("SELECT name, username, email, phone, created_at FROM users WHERE id = :id");
+    $stmt = $conn->prepare("SELECT name, username, email, phone, created_at, ga_secret FROM users WHERE id = :id");
     $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->execute();
     $userData = $stmt->fetch(PDO::FETCH_ASSOC) ?: $userData;
 } catch (PDOException $e) {
     echo "Ошибка: " . $e->getMessage();
+}
+
+$tfa = new TwoFactorAuth('MyWebsite');
+
+// Включение 2FA по кнопке
+if (isset($_POST['enable_2fa'])) {
+    $secret = $tfa->createSecret();
+    $stmt = $conn->prepare("UPDATE users SET ga_secret = :secret WHERE id = :id");
+    $stmt->bindParam(':secret', $secret);
+    $stmt->bindParam(':id', $_SESSION['user_id']);
+    $stmt->execute();
+    $userData['ga_secret'] = $secret;
+}
+
+// Показываем QR-код, если секрет есть
+if (!empty($userData['ga_secret'])) {
+    $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($userData['username'], $userData['ga_secret']);
+    $qrCodeHtml = '<img src="' . $qrCodeUrl . '" alt="QR для Google Authenticator">';
+    $qrCodeHtml .= '<p>Сканируйте этот QR-код в Google Authenticator</p>';
+} else {
+    // Красивая кнопка
+    $qrCodeHtml = '
+    <form method="post" style="text-align:center; margin-top:20px;">
+      <button name="enable_2fa" class="btn btn-2fa">
+        <i class="bx bxs-shield"></i> Включить двухфакторную аутентификацию
+      </button>
+    </form>';
 }
 ?>
 <!DOCTYPE html>
@@ -89,6 +118,10 @@ try {
     </form>
     <div class="register-link">
       <p><a href="profile.php">Return</a></p>
+    </div>
+    <div class="two-factor-auth">
+      <h3>Two-Factor Authentication</h3>
+      <?= $qrCodeHtml ?>
     </div>
   </div>
   <script>

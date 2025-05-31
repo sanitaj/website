@@ -149,6 +149,33 @@ body {
     /* ничего не нужно, js управляет display */
 }
 
+.btn-2fa {
+    background: linear-gradient(90deg, #DC7000 60%, #ffb347 100%);
+    color: #fff !important;
+    border: none;
+    border-radius: 40px;
+    padding: 13px 36px;
+    font-size: 1.08em;
+    font-weight: 700;
+    box-shadow: 0 2px 12px rgba(220,112,0,0.10);
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    margin: 0 auto;
+    display: inline-block;
+    letter-spacing: 0.02em;
+    text-align: center;
+}
+.btn-2fa i {
+    margin-right: 8px;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+.btn-2fa:hover {
+    background: linear-gradient(90deg, #b95c00 60%, #ffb347 100%);
+    color: #fff !important;
+    box-shadow: 0 4px 18px rgba(220,112,0,0.18);
+}
+
 @media (max-width: 500px) {
     .wrapper { width: 98vw; padding: 10px 2vw; }
 }
