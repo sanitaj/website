@@ -64,5 +64,3 @@ function checkScroll() {
 
 checkScroll();
 window.addEventListener("scroll", checkScroll);
-
-

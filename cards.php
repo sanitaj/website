@@ -1,6 +1,6 @@
 <?php
 session_start();
-var_dump($_SESSION);
+// var_dump($_SESSION);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,10 +51,6 @@ var_dump($_SESSION);
             <p class="dot-before">Personal cashbacks in the loyalty program</p>
             <p class="dot-before">Payment by installments" and "Instant installments": buy now - pay later</p>
         </div>
-    </a>
-    <a href="index.php" class="block sticky card-link" style="margin-bottom: 45vh;">
-        <img src="" alt="">
-        <h3>Learn about us</h3>
     </a>
 </div>
     </div>

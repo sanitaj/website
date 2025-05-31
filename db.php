@@ -1,12 +1,13 @@
 <?php
 $host = 'localhost';
 $dbname = 'users_db';
-$username = 'root'; 
-$password = '';   
+$username = 'root';
+$password = '';
 
-$conn = new mysqli($host, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Устанавливаем режим ошибок
+} catch (PDOException $e) {
+    die("Ошибка подключения: " . $e->getMessage());
 }
 ?>

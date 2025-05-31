@@ -1,50 +1,78 @@
-
 <?php
 session_start();
 require 'db.php';
 
 // Получаем текущий баланс пользователя
 $user_id = $_SESSION['user_id'] ?? 0;
-$stmt = $conn->prepare("SELECT balance FROM users WHERE id=?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($balance);
-$stmt->fetch();
-$stmt->close();
-
-// Преобразуем баланс к числу (убираем все, кроме цифр и точки)
-$balance = floatval(preg_replace('/[^\d.]/', '', $balance));
-
+$balance = 0.0;
 $message = '';
+
+try {
+    $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
+    $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $balance = $stmt->fetchColumn();
+    $balance = floatval(preg_replace('/[^\d.]/', '', $balance));
+} catch (PDOException $e) {
+    $message = "Ошибка: " . $e->getMessage();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = floatval($_POST['amount'] ?? 0);
+    $phone = $_POST['phone'] ?? '';
     if ($amount <= 0) {
         $message = "Введите корректную сумму.";
     } else {
         if (isset($_POST['request'])) {
             // Запросить деньги (прибавить)
             $balance += $amount;
-            $stmt = $conn->prepare("UPDATE users SET balance=? WHERE id=?");
-            $stmt->bind_param("di", $balance, $user_id);
-            $stmt->execute();
-            $stmt->close();
-            $message = "Сумма успешно зачислена!";
+            try {
+                $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
+                $stmt->bindParam(':balance', $balance);
+                $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+                $stmt->execute();
+
+                // Добавляем транзакцию (пополнение)
+                $desc = "Пополнение через запрос";
+                $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
+                $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                $stmt->bindParam(':description', $desc, PDO::PARAM_STR);
+                $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
+                $stmt->execute();
+
+                $message = "Сумма успешно зачислена!";
+            } catch (PDOException $e) {
+                $message = "Ошибка: " . $e->getMessage();
+            }
         } elseif (isset($_POST['send'])) {
             // Отправить деньги (вычесть)
             if ($balance >= $amount) {
                 $balance -= $amount;
-                $stmt = $conn->prepare("UPDATE users SET balance=? WHERE id=?");
-                $stmt->bind_param("di", $balance, $user_id);
-                $stmt->execute();
-                $stmt->close();
-                $message = "Сумма успешно отправлена!";
+                try {
+                    $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
+                    $stmt->bindParam(':balance', $balance);
+                    $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+                    $stmt->execute();
+
+                    // Добавляем транзакцию (расход)
+                    $desc = "Перевод пользователю " . htmlspecialchars($phone);
+                    $negAmount = -$amount;
+                    $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
+                    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+                    $stmt->bindParam(':description', $desc, PDO::PARAM_STR);
+                    $stmt->bindParam(':amount', $negAmount, PDO::PARAM_STR);
+                    $stmt->execute();
+
+                    $message = "Сумма успешно отправлена!";
+                } catch (PDOException $e) {
+                    $message = "Ошибка: " . $e->getMessage();
+                }
             } else {
                 $message = "Недостаточно средств!";
             }
         }
     }
 }
-$conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="ru">

@@ -144,6 +144,11 @@ body {
     text-decoration: underline;
 }
 
+/* Скрытие полей только для чтения при редактировании */
+.readonly-box {
+    /* ничего не нужно, js управляет display */
+}
+
 @media (max-width: 500px) {
     .wrapper { width: 98vw; padding: 10px 2vw; }
 }

@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 
@@ -7,21 +6,22 @@ $user = "root";
 $password = "";
 $dbname = "users_db";
 
-$conn = new mysqli($host, $user, $password, $dbname);
-if ($conn->connect_error) {
-    die("Ошибка подключения: " . $conn->connect_error);
+try {
+    $conn = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Ошибка подключения: " . $e->getMessage());
 }
 
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-$sql = "SELECT * FROM users WHERE username = ?";
+$sql = "SELECT * FROM users WHERE username = :username";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $username);
+$stmt->bindParam(':username', $username, PDO::PARAM_STR);
 $stmt->execute();
-$result = $stmt->get_result();
 
-if ($row = $result->fetch_assoc()) {
+if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     if (password_verify($password, $row['password'])) {
         $_SESSION['user_id'] = $row['id']; 
         header("Location: profile.php");
@@ -32,7 +32,4 @@ if ($row = $result->fetch_assoc()) {
 } else {
     echo "Пользователь не найден.";
 }
-
-$stmt->close();
-$conn->close();
 ?>

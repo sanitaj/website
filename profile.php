@@ -1,29 +1,46 @@
 <?php
 session_start();
 require 'db.php';
-$user_id = $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT name, username, email, phone, balance, card_img FROM users WHERE id=?");
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($name, $username, $email, $phone, $balance, $card_img);
-$stmt->fetch();
-$stmt->close();
-$conn->close();
+
+$user_id = $_SESSION['user_id'] ?? 0;
 
 $user = [
-    'name' => $name,
-    'username' => $username,
-    'email' => $email,
-    'phone' => $phone,
-    'balance' => $balance,
-    'card_img' => $card_img ?: 'img/11.png'
+    'name' => '',
+    'username' => '',
+    'email' => '',
+    'phone' => '',
+    'balance' => 0,
+    'card_img' => 'img/11.png'
 ];
-$transactions = [
-    ['date' => '2024-05-28', 'desc' => 'Перевод на карту', 'sum' => '-1 000 zl'],
-    ['date' => '2024-05-27', 'desc' => 'Пополнение', 'sum' => '+5 000 zl'],
-    ['date' => '2024-05-25', 'desc' => 'Оплата услуг', 'sum' => '-2 300 zl'],
-    ['date' => '2024-05-20', 'desc' => 'Зачисление зарплаты', 'sum' => '+50 000 zl'],
-];
+
+try {
+    $stmt = $conn->prepare("SELECT name, username, email, phone, balance, card_img FROM users WHERE id = :id");
+    $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($data) {
+        $user = [
+            'name' => $data['name'],
+            'username' => $data['username'],
+            'email' => $data['email'],
+            'phone' => $data['phone'],
+            'balance' => $data['balance'],
+            'card_img' => $data['card_img'] ?: 'img/11.png'
+        ];
+    }
+} catch (PDOException $e) {
+    // Можно добавить обработку ошибок или логирование
+}
+
+$transactions = [];
+try {
+    $stmt = $conn->prepare("SELECT date, description, amount FROM transactions WHERE user_id = :user_id ORDER BY date DESC LIMIT 4");
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Можно добавить обработку ошибок или логирование
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -41,9 +58,9 @@ $transactions = [
         <!-- Окно 1: Информация о пользователе -->
         <div class="profile-box user-info">
             <h2>Профиль</h2>
-            <div class="info-row"><i class='bx bxs-user'></i> <span><?php echo $user['username']; ?></span></div>
-            <div class="info-row"><i class='bx bxs-envelope'></i> <span><?php echo $user['email']; ?></span></div>
-            <div class="info-row"><i class='bx bxs-phone'></i> <span><?php echo $user['phone']; ?></span></div>
+            <div class="info-row"><i class='bx bxs-user'></i> <span><?php echo htmlspecialchars($user['username']); ?></span></div>
+            <div class="info-row"><i class='bx bxs-envelope'></i> <span><?php echo htmlspecialchars($user['email']); ?></span></div>
+            <div class="info-row"><i class='bx bxs-phone'></i> <span><?php echo htmlspecialchars($user['phone']); ?></span></div>
             <a href="account.php" class="btn">Настройки профиля</a>
         </div>
         <!-- Окно 2: Состояние счета -->
@@ -55,23 +72,27 @@ $transactions = [
         <!-- Окно 3: Банковская карта -->
         <div class="profile-box card-info">
             <h2>Ваша карта</h2>
-            <img src="<?php echo $user['card_img']; ?>" alt="Банковская карта" class="bank-card">
+            <img src="<?php echo htmlspecialchars($user['card_img']); ?>" alt="Банковская карта" class="bank-card">
         </div>
         <!-- Окно 4: История транзакций -->
         <div class="profile-box transactions-info">
-            <h2>История транзакций</h2>
-            <ul class="transactions-list">
-                <?php foreach ($transactions as $tr): ?>
-                    <li>
-                        <span class="tr-date"><?php echo $tr['date']; ?></span>
-                        <span class="tr-desc"><?php echo $tr['desc']; ?></span>
-                        <span class="tr-sum <?php echo strpos($tr['sum'], '+') === 0 ? 'plus' : 'minus'; ?>">
-                            <?php echo $tr['sum']; ?>
-                        </span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+    <h2>История транзакций</h2>
+    <ul class="transactions-list">
+        <?php if (count($transactions) === 0): ?>
+            <li><span>Нет транзакций</span></li>
+        <?php else: ?>
+            <?php foreach ($transactions as $tr): ?>
+                <li>
+                    <span class="tr-date"><?= htmlspecialchars(date('Y-m-d', strtotime($tr['date']))) ?></span>
+                    <span class="tr-desc"><?= htmlspecialchars($tr['description']) ?></span>
+                    <span class="tr-sum <?= $tr['amount'] >= 0 ? 'plus' : 'minus' ?>">
+                        <?= ($tr['amount'] >= 0 ? '+' : '') . number_format($tr['amount'], 2, '.', ' ') . ' zł' ?>
+                    </span>
+                </li>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </ul>
+</div>
     </div>
     <div class="register-link">
         <p><a href="index.php">Вернуться в меню</a></p>

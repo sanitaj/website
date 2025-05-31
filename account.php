@@ -4,6 +4,7 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
+
 if (isset($_POST['logout'])) {
     session_unset();
     session_destroy();
@@ -11,11 +12,7 @@ if (isset($_POST['logout'])) {
     exit();
 }
 
-$host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "users_db";
-$conn = new mysqli($host, $user, $password, $dbname);
+require 'db.php'; // Подключение к базе данных через PDO
 
 $userData = [
     'name' => 'User',
@@ -25,22 +22,14 @@ $userData = [
     'created_at' => '2025'
 ];
 
-if (!$conn->connect_error) {
-    $stmt = $conn->prepare("SELECT name, username, email, phone, created_at FROM users WHERE id = ?");
-    $stmt->bind_param("i", $_SESSION['user_id']);
+try {
+    // Подготовка запроса для получения данных пользователя
+    $stmt = $conn->prepare("SELECT name, username, email, phone, created_at FROM users WHERE id = :id");
+    $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->execute();
-    $stmt->bind_result($name, $username, $email, $phone, $created_at);
-    if ($stmt->fetch()) {
-        $userData = [
-            'name' => $name,
-            'username' => $username,
-            'email' => $email,
-            'phone' => $phone,
-            'created_at' => $created_at
-        ];
-    }
-    $stmt->close();
-    $conn->close();
+    $userData = $stmt->fetch(PDO::FETCH_ASSOC) ?: $userData;
+} catch (PDOException $e) {
+    echo "Ошибка: " . $e->getMessage();
 }
 ?>
 <!DOCTYPE html>
@@ -50,6 +39,7 @@ if (!$conn->connect_error) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My Account</title>
   <link rel="stylesheet" href="css/account.css" >
+  <script src="js/script.js" defer></script>
 </head>
 <body>
   <div class="wrapper">
@@ -62,8 +52,12 @@ if (!$conn->connect_error) {
         </h1>
       </div>
       <div class="input-box">
+        <span class="input-label">Name</span>
+        <input class="edit-field" type="text" name="name" value="<?= htmlspecialchars($userData['name']) ?>" readonly required>
+      </div>
+      <div class="input-box readonly-box">
         <span class="input-label">Username</span>
-        <input class="edit-field" type="text" name="username" value="<?= htmlspecialchars($userData['username']) ?>" readonly required>
+        <input class="edit-field" type="text" name="username" value="<?= htmlspecialchars($userData['username']) ?>" readonly disabled required>
       </div>
       <div class="input-box">
         <span class="input-label">Email</span>
@@ -73,7 +67,7 @@ if (!$conn->connect_error) {
         <span class="input-label">Phone</span>
         <input class="edit-field" type="text" name="phone" value="<?= htmlspecialchars($userData['phone']) ?>" readonly required>
       </div>
-      <div class="input-box">
+      <div class="input-box readonly-box">
         <span class="input-label">Member since</span>
         <input class="edit-field" type="text" value="<?= htmlspecialchars($userData['created_at']) ?>" readonly disabled>
       </div>
@@ -106,6 +100,10 @@ if (!$conn->connect_error) {
           input.removeAttribute('readonly');
         }
       });
+      // Скрыть поля только для чтения
+      document.querySelectorAll('.readonly-box').forEach(function(box) {
+        box.style.display = 'none';
+      });
       document.getElementById('editBtn').style.display = 'none';
       document.getElementById('saveBtn').style.display = '';
       document.getElementById('cancelBtn').style.display = '';
@@ -116,6 +114,10 @@ if (!$conn->connect_error) {
           input.value = originalValues[input.name];
           input.setAttribute('readonly', true);
         }
+      });
+      // Показать поля только для чтения обратно
+      document.querySelectorAll('.readonly-box').forEach(function(box) {
+        box.style.display = '';
       });
       document.getElementById('editBtn').style.display = '';
       document.getElementById('saveBtn').style.display = 'none';

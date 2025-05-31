@@ -4,11 +4,25 @@
     padding: 0;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, rgb(0, 0, 0) 38%, rgba(51, 3, 0, 1) 100%);
+    background-size: cover;
+    background-position: center;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     color: #fff;
     font-size: 16px;
+    /* Убираем белую линию сверху */
+    min-height: 100vh;
+    box-sizing: border-box;
+    background: transparent;
+
 }
 
 a {
@@ -21,8 +35,14 @@ img {
 
 /* Общий фон */
 .wrapper {
-    background: linear-gradient(180deg, rgb(0, 0, 0) 38%, rgba(51, 3, 0, 1) 100%);    
-    width: 100%;
+    background: linear-gradient(180deg, rgb(0, 0, 0) 38%, rgba(51, 3, 0, 1) 100%);
+    width: 100vw;
+    min-height: 100vh;
+    min-width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    position: relative;
 }
 
 /* Контейнер */
