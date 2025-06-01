@@ -1,5 +1,8 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if (!isset($_SESSION['tmp_user_id'])) { header('Location: login.php'); exit; }
 require 'db.php';
 require_once __DIR__ . '/vendor/autoload.php';

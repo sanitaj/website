@@ -1,10 +1,13 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require 'db.php';
 
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
     $token = $_COOKIE['rememberme'];
-    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE remember_token = :token");
     $stmt->bindParam(':token', $token);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -20,7 +23,7 @@ $balance = 0.0;
 $message = '';
 
 try {
-    $stmt = $conn->prepare("SELECT balance FROM users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT balance FROM users WHERE id = :id");
     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $balance = $stmt->fetchColumn();
@@ -37,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = "Введите корректную сумму.";
     } else {
         // Проверяем, существует ли получатель
-        $stmt = $conn->prepare("SELECT id, balance FROM users WHERE username = :username");
+        $stmt = $pdo->prepare("SELECT id, balance FROM users WHERE username = :username");
         $stmt->bindParam(':username', $username, PDO::PARAM_STR);
         $stmt->execute();
         $recipient = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -50,25 +53,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Отправить деньги
             if ($balance >= $amount) {
                 try {
-                    $conn->beginTransaction();
+                    $pdo->beginTransaction();
 
                     // Списываем у отправителя
                     $newSenderBalance = $balance - $amount;
-                    $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
+                    $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE id = :id");
                     $stmt->bindParam(':balance', $newSenderBalance);
                     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
                     $stmt->execute();
 
                     // Зачисляем получателю
                     $newRecipientBalance = floatval($recipient['balance']) + $amount;
-                    $stmt = $conn->prepare("UPDATE users SET balance = :balance WHERE id = :id");
+                    $stmt = $pdo->prepare("UPDATE users SET balance = :balance WHERE id = :id");
                     $stmt->bindParam(':balance', $newRecipientBalance);
                     $stmt->bindParam(':id', $recipient['id'], PDO::PARAM_INT);
                     $stmt->execute();
 
                     // Транзакция для отправителя (расход)
                     $descSender = "Перевод пользователю " . htmlspecialchars($username);
-                    $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
+                    $stmt = $pdo->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
                     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
                     $stmt->bindParam(':description', $descSender, PDO::PARAM_STR);
                     $negAmount = -$amount;
@@ -77,17 +80,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Транзакция для получателя (пополнение)
                     $descRecipient = "Получено от пользователя " . htmlspecialchars($_SESSION['username'] ?? $user_id);
-                    $stmt = $conn->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
+                    $stmt = $pdo->prepare("INSERT INTO transactions (user_id, description, amount) VALUES (:user_id, :description, :amount)");
                     $stmt->bindParam(':user_id', $recipient['id'], PDO::PARAM_INT);
                     $stmt->bindParam(':description', $descRecipient, PDO::PARAM_STR);
                     $stmt->bindParam(':amount', $amount, PDO::PARAM_STR);
                     $stmt->execute();
 
-                    $conn->commit();
+                    $pdo->commit();
                     $balance = $newSenderBalance;
                     $message = "Сумма успешно отправлена!";
                 } catch (PDOException $e) {
-                    $conn->rollBack();
+                    $pdo->rollBack();
                     $message = "Ошибка: " . $e->getMessage();
                 }
             } else {
