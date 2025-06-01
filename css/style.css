@@ -134,7 +134,8 @@ header nav ul li .dropdown li a {
     color: #fff;
     transition: background 0.3s ease, color 0.3s ease;
     border-radius: 8px;
-    text-align: center;
+    text-align: left;
+    max-width: none;
 }
 
 
@@ -174,6 +175,7 @@ header nav ul li .dropdown li a:hover {
     margin: 30px 0;
 }
 
+
 .hero--info .btn {
     background: #DC7000;
     color: #000000;
@@ -183,6 +185,8 @@ header nav ul li .dropdown li a:hover {
     transition: all 0.3s ease;
     font-size: 18px;
 }
+
+
 
 .hero--info .btn:hover {
     cursor: pointer;
@@ -300,12 +304,14 @@ header nav ul li .dropdown li a:hover {
 .footer-links a {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
+    text-transform: uppercase;
+    color: #fff;
     text-decoration: none;
-    transition: 0.3s ease-in-out;
+    transition: text-decoration 0.3s ease-in-out;
 }
 
 .footer-links a:hover {
+    color: #fff;
     text-decoration: underline;
 }
 
@@ -332,19 +338,6 @@ header nav ul li .dropdown li a:hover {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Лёгкий эффект тени */
 }
 
-.footer-links a {
-    font-size: 16px;
-    font-weight: 600;
-    text-transform: uppercase; /* Делаем ссылки более заметными */
-    color: rgba(255, 255, 255, 0.8);
-    transition: color 0.3s ease-in-out;
-}
-
-.footer-links a:hover {
-    color: #000000; /* Акцентный цвет при наведении */
-    text-decoration: underline;
-}
-
 #logoutButton {
     background: #DC7000;
     color: #fff;
@@ -360,3 +353,30 @@ header nav ul li .dropdown li a:hover {
     background: #330300;
     transform: scale(1.1);
 }
+
+.parallax-img {
+    width: 650px;      /* увеличенный размер */
+    max-width: 90vw;   /* адаптивность */
+    height: auto;
+    transition: transform 0.3s cubic-bezier(.25,.46,.45,.94);
+    will-change: transform;
+}
+
+/* Только для первого уровня меню */
+header nav > ul > li > a {
+    max-width: 110px;
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+    display: inline-block;
+    line-height: 1.2;
+}
+
+/* Для выпадающих ссылок — выравнивание влево */
+header nav ul li .dropdown li a {
+    text-align: left;
+    max-width: none;
+    display: block;
+}
+
+

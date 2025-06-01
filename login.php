@@ -1,5 +1,8 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +31,7 @@ session_start();
 
       <div class="remember-forgot">
         <label><input type="checkbox" name="remember" />Remember me</label>
-        <a href="#">Forgot password?</a>
+        <a href="forgot_pass.php">Forgot password?</a>
       </div>
 
       <button type="submit" class="btn">Login</button>

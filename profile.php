@@ -1,10 +1,13 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require 'db.php';
 
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
     $token = $_COOKIE['rememberme'];
-    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE remember_token = :token");
     $stmt->bindParam(':token', $token);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -26,7 +29,7 @@ $user = [
 ];
 
 try {
-    $stmt = $conn->prepare("SELECT name, username, email, phone, balance, card_img FROM users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT name, username, email, phone, balance, card_img FROM users WHERE id = :id");
     $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $data = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -46,7 +49,7 @@ try {
 
 $transactions = [];
 try {
-    $stmt = $conn->prepare("SELECT date, description, amount FROM transactions WHERE user_id = :user_id ORDER BY date DESC LIMIT 4");
+    $stmt = $pdo->prepare("SELECT date, description, amount FROM transactions WHERE user_id = :user_id ORDER BY date DESC LIMIT 4");
     $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
     $stmt->execute();
     $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);

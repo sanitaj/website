@@ -1,10 +1,13 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require 'db.php';
 
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['rememberme'])) {
     $token = $_COOKIE['rememberme'];
-    $stmt = $conn->prepare("SELECT id, username FROM users WHERE remember_token = :token");
+    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE remember_token = :token");
     $stmt->bindParam(':token', $token);
     $stmt->execute();
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,7 +24,7 @@ if (!isset($_SESSION['user_id'])) {
 
 if (isset($_POST['logout'])) {
     if (isset($_SESSION['user_id'])) {
-        $stmt = $conn->prepare("UPDATE users SET remember_token = NULL WHERE id = :id");
+        $stmt = $pdo->prepare("UPDATE users SET remember_token = NULL WHERE id = :id");
         $stmt->bindParam(':id', $_SESSION['user_id']);
         $stmt->execute();
     }
@@ -45,7 +48,7 @@ $userData = [
 
 try {
     // Подготовка запроса для получения данных пользователя
-    $stmt = $conn->prepare("SELECT name, username, email, phone, created_at, ga_secret FROM users WHERE id = :id");
+    $stmt = $pdo->prepare("SELECT name, username, email, phone, created_at, ga_secret FROM users WHERE id = :id");
     $stmt->bindParam(':id', $_SESSION['user_id'], PDO::PARAM_INT);
     $stmt->execute();
     $userData = $stmt->fetch(PDO::FETCH_ASSOC) ?: $userData;
@@ -58,7 +61,7 @@ $tfa = new TwoFactorAuth('MyWebsite');
 // Включение 2FA по кнопке
 if (isset($_POST['enable_2fa'])) {
     $secret = $tfa->createSecret();
-    $stmt = $conn->prepare("UPDATE users SET ga_secret = :secret WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE users SET ga_secret = :secret WHERE id = :id");
     $stmt->bindParam(':secret', $secret);
     $stmt->bindParam(':id', $_SESSION['user_id']);
     $stmt->execute();

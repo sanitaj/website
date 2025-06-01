@@ -1,5 +1,8 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require 'db.php'; // Предполагается, что в db.php создается объект $conn для PDO
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

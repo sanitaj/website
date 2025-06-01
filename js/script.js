@@ -36,6 +36,26 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("scroll", checkScroll);
 });
 
+// 🔹 Параллакс-эффект для picture4.svg
+document.addEventListener("mousemove", function(e) {
+    const img = document.querySelector('.parallax-img');
+    if (!img) return;
+    // Настрой интенсивность параллакса:
+    const intensity = 20; // меньше — сильнее эффект, больше — слабее
+    const rotateIntensity = 40; // меньше — сильнее вращение
+
+    const x = (window.innerWidth / 2 - e.clientX) / intensity;
+    const y = (window.innerHeight / 2 - e.clientY) / intensity;
+    const rotateY = (window.innerWidth / 2 - e.clientX) / rotateIntensity;
+    const rotateX = (window.innerHeight / 2 - e.clientY) / rotateIntensity;
+
+    img.style.transform = `
+        translate(${x}px, ${y}px)
+        rotateY(${rotateY}deg)
+        rotateX(${-rotateX}deg)
+    `;
+});
+
 let cards = document.querySelectorAll(".block");
 
 function checkScroll() {
