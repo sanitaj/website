@@ -11,8 +11,10 @@ $stmt->execute([$token]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    die('Invalid or expired token.');
+    die('Invalid link.');
 }
+
+// Показываем форму для нового пароля...
 ?>
 <!DOCTYPE html>
 <html lang="en">
