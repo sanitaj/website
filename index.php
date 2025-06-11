@@ -72,7 +72,7 @@ error_reporting(E_ALL);
                     Manage your finances with ease and security. Open an account in minutes, access innovative digital services, and enjoy 24/7 support. 
                     ZXC Bank brings you seamless payments, instant transfers, and powerful tools for individuals and businesses.
                 </p>
-                <button style="margin-bottom: 400px;" class="btn">Open an Account</button>
+                <button style="margin-bottom: 400px;" class="btn" onclick="window.location.href='reg.php'">Open an Account</button>
             </div>
             <img src="img/19.png" alt="ZXC Bank" class="parallax-img">
         </div>
